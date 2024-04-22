@@ -1,3 +1,4 @@
+import Tesseract from 'tesseract.js';
 import React, { useRef, useState, useEffect } from 'react';
 import { FilesetResolver, ImageClassifier } from "@mediapipe/tasks-vision";
 import { Image, VStack, HStack, Center, Button, Text, Box } from '@chakra-ui/react';
@@ -6,10 +7,30 @@ import { saveAs } from 'file-saver';
 function Output({ setLayout, outputImage }) {
     
     const imageRef = useRef(null);
+    const [reader, setReader] = useState('');    
     const [result, setResult] = useState([]);
 
     useEffect(() => {
         if (imageRef.current === null) return;
+
+
+        async function recognizeText() {
+            const result = await Tesseract.recognize(imageRef.current);
+        
+            // Set the minimum confidence score threshold
+            const confidenceThreshold = 70; // Adjust this threshold as needed
+        
+            const filteredText = result.data.words
+                .filter(word => word.confidence > confidenceThreshold)
+                .map(word => word.text)
+                .join(' ');
+        
+            console.log("Filtered Text:", filteredText);
+            setReader(filteredText);
+        }
+        
+        recognizeText();
+        
 
         async function createImageClassifier() {
             const vision = await FilesetResolver.forVisionTasks(
@@ -51,22 +72,32 @@ function Output({ setLayout, outputImage }) {
 
     return (
         <Center>
+            
+            <VStack justifyContent={'center'} height={'100vh'} ml={100}>
+                <Image src={`/images/logo_head.png`} alt='Logo' ml={30} mb={2}/>
+                <Image ref={imageRef} src={outputImage} width={640} border={'4px solid black'}/>            
+
+                <HStack justifyContent={'space-around'}>
+                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleRetake} >Take New Image</Button>
+                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleSave} >Save To txt file</Button> 
+                </HStack>
+            
+
+                {
+                    reader !== '' && <Text fontSize={20} mt={10}>{reader}</Text>
+                }                   
+            </VStack>
+
             {
                 result.length > 0 && 
                 <Box textAlign={'right'}>
                     {result.map((item, index) => (
                         <Text key={index} fontSize={'20'}>{item.categoryName + ':\t ' + item.score}</Text>
                     ))}
+
                 </Box>
             }
-            <VStack justifyContent={'center'} height={'100vh'}>
-                <Image src={`/images/logo_head.png`} alt='Logo' ml={30} mb={2}/>
-                <Image ref={imageRef} src={outputImage} width={640}/>
-                <HStack justifyContent={'space-around'}>
-                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleRetake} >Take New Image</Button>
-                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleSave} >Save To txt file</Button> 
-                </HStack>
-            </VStack>
+            
         </Center>
     );
 }
