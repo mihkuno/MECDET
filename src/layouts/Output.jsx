@@ -4,6 +4,10 @@ import { FilesetResolver, ImageClassifier } from "@mediapipe/tasks-vision";
 import { Image, VStack, HStack, Center, Button, Text, Box } from '@chakra-ui/react';
 import { saveAs } from 'file-saver';
 
+import {
+    Ascozin, Bioflu, Biogesic, Bonamine, Buscopan, DayZinc, Decolgen, Flanax, Imodium, Lactezin, Lagundi, Midol, Myra_E, Neurogen_E, Omeprazole, Rinityn, Rogin_E, Sinecod, Tempra, Tuseran
+} from '../components/Description';
+
 function Output({ setLayout, outputImage }) {
     
     const imageRef = useRef(null);
@@ -43,11 +47,14 @@ function Output({ setLayout, outputImage }) {
             });
 
             const output = imageClassifier.classify(imageRef.current);
+
+            console.log(output);
+
             const result = output.classifications[0].categories.slice(0, 5).map(item => ({
                 score: (item.score * 100).toFixed(2) + "%",
                 categoryName: item.categoryName
             }));
-            
+
             setResult(result);
         }
         
@@ -71,34 +78,65 @@ function Output({ setLayout, outputImage }) {
     }
 
     return (
+        <>
+        
         <Center>
-            
-            <VStack justifyContent={'center'} height={'100vh'} ml={100}>
-                <Image src={`/images/logo_head.png`} alt='Logo' ml={30} mb={2}/>
-                <Image ref={imageRef} src={outputImage} width={640} border={'4px solid black'}/>            
-
-                <HStack justifyContent={'space-around'}>
-                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleRetake} >Take New Image</Button>
-                    <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleSave} >Save To txt file</Button> 
-                </HStack>
-            
+            <Box>
+                <Center><Image src={`/images/logo_head.png`} alt='Logo' ml={30} mb={2}/></Center>
+                
 
                 {
-                    reader !== '' && <Text fontSize={20} mt={10}>{reader}</Text>
-                }                   
-            </VStack>
+                    result.length > 0 && 
+                    <Box textAlign={'right'} float={'right'} mr={-150} mt={50}>
+                        {result.map((item, index) => (
+                            <Text key={index} fontSize={'20'}>{item.categoryName + ':\t ' + item.score}</Text>
+                        ))}
 
-            {
-                result.length > 0 && 
-                <Box textAlign={'right'}>
-                    {result.map((item, index) => (
-                        <Text key={index} fontSize={'20'}>{item.categoryName + ':\t ' + item.score}</Text>
-                    ))}
+                    </Box>
+                }
+                
+                
+                <Center><Image ref={imageRef} src={outputImage} width={640} border={'4px solid black'}/></Center>
 
-                </Box>
-            }
             
+                
+                {
+                    reader !== '' && <Center><Text fontSize={15} m={1} maxW={750}>{reader}</Text></Center>
+                }   
+                <Center>
+                    <HStack justifyContent={'space-around'}>
+                        <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleRetake} >Take New Image</Button>
+                        <Button colorScheme='blue' fontSize={14} padding={6} w={380} onClick={handleSave} >Save To txt file</Button> 
+                    </HStack>
+                </Center>
+            
+
+                <Box py={20} maxW={800}>
+                    {result.length > 0 && result[0].categoryName === 'Ascozin' && <Ascozin />}
+                    {result.length > 0 && result[0].categoryName === 'Bioflu' && <Bioflu />}
+                    {result.length > 0 && result[0].categoryName === 'Biogesic' && <Biogesic />}
+                    {result.length > 0 && result[0].categoryName === 'Bonamine' && <Bonamine />}
+                    {result.length > 0 && result[0].categoryName === 'Buscopan' && <Buscopan />}
+                    {result.length > 0 && result[0].categoryName === 'DayZinc' && <DayZinc />}
+                    {result.length > 0 && result[0].categoryName === 'Decolgen' && <Decolgen />}
+                    {result.length > 0 && result[0].categoryName === 'Flanax' && <Flanax />}
+                    {result.length > 0 && result[0].categoryName === 'Imodium' && <Imodium />}
+                    {result.length > 0 && result[0].categoryName === 'Lactezin' && <Lactezin />}
+                    {result.length > 0 && result[0].categoryName === 'Lagundi' && <Lagundi />}
+                    {result.length > 0 && result[0].categoryName === 'Midol' && <Midol />}
+                    {result.length > 0 && result[0].categoryName === 'Myra_E' && <Myra_E />}
+                    {result.length > 0 && result[0].categoryName === 'Neurogen_E' && <Neurogen_E />}
+                    {result.length > 0 && result[0].categoryName === 'Omeprazole' && <Omeprazole />}
+                    {result.length > 0 && result[0].categoryName === 'Rinityn' && <Rinityn />}
+                    {result.length > 0 && result[0].categoryName === 'Rogin_E' && <Rogin_E />}
+                    {result.length > 0 && result[0].categoryName === 'Sinecod' && <Sinecod />}
+                    {result.length > 0 && result[0].categoryName === 'Tempra' && <Tempra />}
+                    {result.length > 0 && result[0].categoryName === 'Tuseran' && <Tuseran />}
+                </Box>
+            </Box>
         </Center>
+
+        </>   
     );
 }
 
